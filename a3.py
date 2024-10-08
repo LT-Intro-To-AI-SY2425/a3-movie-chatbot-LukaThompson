@@ -205,12 +205,16 @@ def title_by_actor(matches: List[str]) -> List[str]:
     Returns:
         a list of movie titles that the actor acted in
     """
-    actor = (matches[0])
-    result = []
+
+    if not matches or len(matches) != 1:
+        return []  
+    actor = matches[0]
+    result = set()
     for movie in movie_db:
-        if actor == get_actors(movie):
-            result.append(get_title(movie))
-    return(result)
+        if actor in get_actors(movie):  
+            result.add(get_title(movie))  
+
+    return list(result)  
 
 
 
@@ -237,7 +241,8 @@ pa_list: List[Tuple[List[str], Callable[[List[str]], List[Any]]]] = [
     (["bye"], bye_action),
 ]
 
-
+import re
+from typing import List, Dict, Tuple, Union
 def search_pa_list(src: List[str]) -> List[str]:
     """Takes source, finds matching pattern and calls corresponding action. If it finds
     a match but has no answers it returns ["No answers"]. If it finds no match it
@@ -250,7 +255,20 @@ def search_pa_list(src: List[str]) -> List[str]:
         a list of answers. Will be ["I don't understand"] if it finds no matches and
         ["No answers"] if it finds a match but no answers
     """
-    pass
+    query_string = ' '.join(src)
+    
+    for pattern, action in pa_list:
+        regex_pattern = re.sub(r'%|_', '(.*)', ' '.join(pattern))
+        
+        match = re.fullmatch(regex_pattern, query_string, re.IGNORECASE)
+        if match:
+            matches = list(match.groups())
+            responses = action(matches)
+            if not responses:
+                return ["No answers"]
+            return responses
+
+    return ["I don't understand"]
 
 
 def query_loop() -> None:
