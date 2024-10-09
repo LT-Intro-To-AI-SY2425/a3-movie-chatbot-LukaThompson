@@ -269,6 +269,11 @@ def search_pa_list(src: List[str]) -> List[str]:
             return responses
 
     return ["I don't understand"]
+    # for pat, act in pa_list:
+    #     val = match(pat, src)
+    #     if val != None:
+    #         result = act(val)
+    #         return result
 
 
 def query_loop() -> None:
